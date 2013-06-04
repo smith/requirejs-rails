@@ -13,9 +13,14 @@ Gem::Specification.new do |s|
   s.summary     = "Use RequireJS with the Rails 3 Asset Pipeline"
   s.description = "This gem provides RequireJS support for your Rails 3 application."
 
-  git_test_files, git_files = `git ls-files`.split("\n").partition { |f| f =~ /^test/ }
-  s.test_files = git_test_files
-  s.files = git_files
+  ignores = open('.gitignore').read.split("\n")
+  files = Dir['{**/*,**/.*,.*}'].reject do |f|
+    File.directory?(f) || ignores.any? { |i| File.fnmatch(i, f) }
+  end.uniq.sort
+  test_files, files = files.partition { |f| f =~ /^test/ }
+
+  s.test_files = test_files
+  s.files = files
   s.require_path = 'lib'  
 
   s.add_dependency "railties", ">= 3.1.1", "< 4.1"
